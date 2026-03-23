@@ -2,174 +2,76 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurum Messenger</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: system-ui, sans-serif;
-            background: #0a0e1a;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .card {
-            max-width: 400px;
-            width: 100%;
-            background: #141a2a;
-            border-radius: 24px;
-            padding: 32px;
-            text-align: center;
-        }
-        h1 {
-            color: #4a9eff;
-            margin-bottom: 8px;
-        }
-        input {
-            width: 100%;
-            padding: 14px;
-            margin: 8px 0;
-            border: 1px solid #1e2a3a;
-            border-radius: 12px;
-            background: #0a0e1a;
-            color: white;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 12px;
-            background: #4a9eff;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-gray {
-            background: #1e2a3a;
-        }
-        .hidden {
-            display: none;
-        }
-        .success { color: #4caf50; margin-top: 12px; }
-        .error { color: #ff6b6b; margin-top: 12px; }
-        .status { margin-top: 16px; font-size: 14px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Aurum | Мессенджер</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="card">
-        <h1>✨ Aurum</h1>
-        <p style="color: #6c7a8e; margin-bottom: 24px;">защищённый мессенджер</p>
-        
-        <div id="loginView">
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Пароль">
-            <button onclick="login()">Войти</button>
-            <button class="btn-gray" onclick="showRegister()">Создать аккаунт</button>
+    <div class="app">
+        <div class="screen" id="authScreen">
+            <div class="auth-card">
+                <div class="logo">
+                    <div class="logo-icon">✨</div>
+                    <h1>Aurum</h1>
+                    <p>защищённый мессенджер</p>
+                </div>
+                <div class="tabs">
+                    <button class="tab active" data-tab="login">Вход</button>
+                    <button class="tab" data-tab="register">Регистрация</button>
+                </div>
+                <div class="form active" id="loginForm">
+                    <input type="email" id="loginEmail" placeholder="Email">
+                    <input type="password" id="loginPassword" placeholder="Пароль">
+                    <button id="loginBtn">Войти</button>
+                </div>
+                <div class="form" id="registerForm">
+                    <input type="text" id="regName" placeholder="Ваше имя">
+                    <input type="email" id="regEmail" placeholder="Email">
+                    <input type="password" id="regPassword" placeholder="Пароль">
+                    <button id="registerBtn">Создать аккаунт</button>
+                </div>
+                <div id="authMessage"></div>
+            </div>
         </div>
         
-        <div id="registerView" class="hidden">
-            <input type="text" id="regName" placeholder="Ваше имя">
-            <input type="email" id="regEmail" placeholder="Email">
-            <input type="password" id="regPassword" placeholder="Пароль">
-            <button onclick="register()">Зарегистрироваться</button>
-            <button class="btn-gray" onclick="showLogin()">Назад</button>
+        <div class="screen" id="mainScreen" style="display: none;">
+            <div class="main-container">
+                <div class="sidebar">
+                    <div class="sidebar-header">
+                        <div class="user-avatar" id="userAvatar">A</div>
+                        <div class="user-name" id="userName">Загрузка...</div>
+                        <button class="icon-btn" id="logoutMainBtn">🚪</button>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Поиск...">
+                    </div>
+                    <div class="chats-list" id="chatsList">
+                        <div class="empty-state">Нет чатов</div>
+                    </div>
+                </div>
+                <div class="chat-area">
+                    <div class="chat-header">
+                        <div class="chat-user">
+                            <div class="chat-avatar" id="chatAvatar">👤</div>
+                            <div>
+                                <div class="chat-name" id="chatName">Выберите чат</div>
+                                <div class="chat-status" id="chatStatus">онлайн</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="messagesContainer">
+                        <div class="messages" id="messages">
+                            <div class="empty-chat">Выберите чат чтобы начать общение</div>
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <input type="text" id="messageInput" placeholder="Сообщение">
+                        <button id="sendBtn">📤</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div id="message" class="status"></div>
     </div>
-
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
-            }
-        }
-    </script>
-
-    <script type="module">
-        import { initializeApp } from "firebase/app";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
-        import { getFirestore, doc, setDoc } from "firebase/firestore";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyA19cg9dvbo_2t59pNmEC5Hm7Ryj9hjQb0",
-            authDomain: "aurum-e244a.firebaseapp.com",
-            projectId: "aurum-e244a",
-            storageBucket: "aurum-e244a.firebasestorage.app",
-            messagingSenderId: "403538033504",
-            appId: "1:403538033504:web:dde02304b4665f0fe1bc05"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        window.login = async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const msgDiv = document.getElementById('message');
-            
-            try {
-                const user = await signInWithEmailAndPassword(auth, email, password);
-                msgDiv.innerHTML = '<div class="success">✅ Вход выполнен! Привет, ' + (user.user.displayName || email) + '!</div>';
-            } catch (error) {
-                msgDiv.innerHTML = '<div class="error">❌ ' + error.message + '</div>';
-            }
-        };
-        
-        window.register = async () => {
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const msgDiv = document.getElementById('message');
-            
-            if (!name || !email || !password) {
-                msgDiv.innerHTML = '<div class="error">❌ Заполните все поля</div>';
-                return;
-            }
-            
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await updateProfile(userCredential.user, { displayName: name });
-                await setDoc(doc(db, 'users', userCredential.user.uid), {
-                    uid: userCredential.user.uid,
-                    name: name,
-                    email: email,
-                    createdAt: Date.now()
-                });
-                msgDiv.innerHTML = '<div class="success">✅ Регистрация успешна! Теперь войдите.</div>';
-                showLogin();
-                document.getElementById('regName').value = '';
-                document.getElementById('regEmail').value = '';
-                document.getElementById('regPassword').value = '';
-            } catch (error) {
-                msgDiv.innerHTML = '<div class="error">❌ ' + error.message + '</div>';
-            }
-        };
-        
-        window.showRegister = () => {
-            document.getElementById('loginView').classList.add('hidden');
-            document.getElementById('registerView').classList.remove('hidden');
-            document.getElementById('message').innerHTML = '';
-        };
-        
-        window.showLogin = () => {
-            document.getElementById('registerView').classList.add('hidden');
-            document.getElementById('loginView').classList.remove('hidden');
-            document.getElementById('message').innerHTML = '';
-        };
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
