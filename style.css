@@ -369,3 +369,121 @@ body {
         max-width: 85%;
     }
 }
+/* ========== АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНА ========== */
+@media (max-width: 768px) {
+    /* Основной контейнер */
+    .main-container {
+        position: relative;
+    }
+    
+    /* Боковая панель - скрыта по умолчанию */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        background: #0f1322;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    /* Кнопка меню для телефона */
+    .menu-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #4a9eff;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 101;
+        box-shadow: 0 4px 12px rgba(74,158,255,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Область чата - на всю ширину */
+    .chat-area {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    /* Хедер чата с кнопкой назад */
+    .chat-header {
+        padding: 12px 16px;
+    }
+    
+    .back-btn-mobile {
+        display: flex;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #4a9eff;
+        margin-right: 8px;
+    }
+    
+    /* Сообщения */
+    .message {
+        max-width: 85%;
+        font-size: 14px;
+    }
+    
+    /* Область ввода */
+    .input-area {
+        padding: 12px 16px;
+    }
+    
+    .input-area input {
+        font-size: 16px;
+        padding: 10px 14px;
+    }
+    
+    /* Заголовок чата */
+    .chat-user {
+        flex: 1;
+    }
+    
+    .chat-name {
+        font-size: 16px;
+    }
+    
+    /* Скрываем кнопки навигации если они есть */
+    .bottom-nav {
+        display: none;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 24px;
+        margin: 16px;
+    }
+    
+    .sidebar {
+        width: 260px;
+    }
+    
+    .chat-avatar-small {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+    
+    .message {
+        padding: 8px 12px;
+    }
+}
