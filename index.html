@@ -2,12 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e1a">
     <title>Aurum | Мессенджер</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app">
+        <!-- Экран авторизации -->
         <div class="screen" id="authScreen">
             <div class="auth-card">
                 <div class="logo">
@@ -34,8 +36,12 @@
             </div>
         </div>
         
+        <!-- Основной экран -->
         <div class="screen" id="mainScreen" style="display: none;">
             <div class="main-container">
+                <button class="menu-btn" id="menuBtn" style="display: none;">☰</button>
+                
+                <!-- Боковая панель (чаты) -->
                 <div class="sidebar">
                     <div class="sidebar-header">
                         <div class="user-avatar" id="userAvatar">A</div>
@@ -43,12 +49,18 @@
                         <button class="icon-btn" id="logoutMainBtn">🚪</button>
                     </div>
                     <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Поиск...">
+                        <input type="text" id="searchInput" placeholder="Поиск по email...">
                     </div>
                     <div class="chats-list" id="chatsList">
-                        <div class="empty-state">Нет чатов</div>
+                        <div class="empty-state">✨ Нет чатов</div>
+                    </div>
+                    <div class="add-contact-area">
+                        <input type="email" id="newContactEmail" placeholder="Email друга">
+                        <button id="addContactBtn">➕ Добавить</button>
                     </div>
                 </div>
+                
+                <!-- Область чата -->
                 <div class="chat-area">
                     <div class="chat-header">
                         <div class="chat-user">
@@ -58,20 +70,88 @@
                                 <div class="chat-status" id="chatStatus">онлайн</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="messages-container" id="messagesContainer">
-                        <div class="messages" id="messages">
-                            <div class="empty-chat">Выберите чат чтобы начать общение</div>
+                        <div class="chat-actions">
+                            <button class="call-btn" id="audioCallBtn" title="Аудиозвонок">📞</button>
+                            <button class="call-btn" id="videoCallBtn" title="Видеозвонок">📹</button>
                         </div>
                     </div>
+                    
+                    <div class="messages-container" id="messagesContainer">
+                        <div class="messages" id="messages">
+                            <div class="empty-chat">💬 Выберите чат чтобы начать общение</div>
+                        </div>
+                    </div>
+                    
                     <div class="input-area">
-                        <input type="text" id="messageInput" placeholder="Сообщение">
-                        <button id="sendBtn">📤</button>
+                        <button class="voice-msg-btn" id="voiceMsgBtn" title="Голосовое сообщение">🎤</button>
+                        <div class="message-input-wrapper">
+                            <input type="text" id="messageInput" placeholder="Сообщение">
+                        </div>
+                        <button class="send-btn" id="sendBtn">📤</button>
+                    </div>
+                    
+                    <!-- Панель записи голоса -->
+                    <div class="voice-recording-panel" id="voiceRecordingPanel" style="display: none;">
+                        <div class="recording-wave">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <span>Запись...</span>
+                        <button id="stopRecordingBtn">⏹️</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Модалка звонка -->
+    <div class="call-modal" id="callModal" style="display: none;">
+        <div class="call-container">
+            <div class="call-avatar-large" id="callAvatarLarge">📞</div>
+            <div class="call-name" id="callName">Звонок</div>
+            <div class="call-status" id="callStatus">Соединение...</div>
+            <div class="call-timer" id="callTimer">00:00</div>
+            <div class="call-controls">
+                <button class="call-end-btn" id="endCallBtn">⏹️ Завершить</button>
+            </div>
+            <video id="localVideo" autoplay muted playsinline style="display: none;"></video>
+            <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
+        </div>
+    </div>
+    
+    <audio id="callRingtone" src="https://www.soundjay.com/phone/phone-ring-01a.mp3" preload="auto"></audio>
+    <audio id="callEndSound" src="https://www.soundjay.com/misc/sounds/beep-07.mp3" preload="auto"></audio>
+    
     <script type="module" src="script.js"></script>
+    <script>
+        // Мобильное меню
+        function checkMobile() {
+            const menuBtn = document.getElementById('menuBtn');
+            if (!menuBtn) return;
+            if (window.innerWidth <= 768) {
+                menuBtn.style.display = 'flex';
+                const chatUser = document.querySelector('.chat-header .chat-user');
+                if (chatUser && !document.querySelector('.back-btn-mobile')) {
+                    const backBtn = document.createElement('button');
+                    backBtn.innerHTML = '←';
+                    backBtn.className = 'back-btn-mobile';
+                    backBtn.style.cssText = 'background:none;border:none;font-size:24px;color:#4a9eff;margin-right:8px;cursor:pointer;';
+                    backBtn.onclick = () => document.querySelector('.sidebar')?.classList.remove('open');
+                    chatUser.insertBefore(backBtn, chatUser.firstChild);
+                }
+            } else {
+                menuBtn.style.display = 'none';
+            }
+        }
+        document.getElementById('menuBtn')?.addEventListener('click', () => {
+            document.querySelector('.sidebar')?.classList.add('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && e.target.closest('.chat-item')) {
+                document.querySelector('.sidebar')?.classList.remove('open');
+            }
+        });
+        window.addEventListener('resize', checkMobile);
+        setTimeout(checkMobile, 500);
+    </script>
 </body>
 </html>
